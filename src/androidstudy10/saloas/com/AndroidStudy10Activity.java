@@ -1,13 +1,107 @@
 package androidstudy10.saloas.com;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Display;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.Toast;
 
 public class AndroidStudy10Activity extends Activity {
     /** Called when the activity is first created. */
-    @Override
+	int _cellCount;
+	int _cellSize; 
+	int _displayWidth;
+	boolean _turn;
+	TableLayout _tableLayout;
+	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        //setContentView(R.layout.main);      
+        initialize();      
     }
+    private void initialize(){
+    	_displayWidth = getDisplayWidth(); 
+    	TableLayout _mainLayerLayout = new TableLayout(this);
+    	
+    	Button _newGameButton = new Button(this);
+        _newGameButton.setText("New Game");       
+        tableInit();
+        
+        _mainLayerLayout.addView(_tableLayout);
+        _mainLayerLayout.addView(_newGameButton);
+        
+        setContentView(_mainLayerLayout);
+        Toast.makeText(getApplicationContext(), 
+        		"Game succesfully refreshed", Toast.LENGTH_SHORT).show();
+    }    
+    private void tableInit(){
+    	_turn = true;
+    	_cellCount = 10;
+    	_cellSize = (_displayWidth/_cellCount)-2; 	
+        //MyImageTouch _imageTouch = new MyImageTouch();
+        MyImageClick _imageClick = new MyImageClick();
+        
+    	_tableLayout = new TableLayout(this);
+        TableRow.LayoutParams param = new TableRow.LayoutParams(_cellSize, _cellSize);
+        param.setMargins(1, 1, 1, 1);
+        for(int i=1; i<= _cellCount; i++){
+        	TableRow tableRow=new TableRow(this);
+        	for(int j=1;j<=_cellCount;j++)
+        	{
+		         ImageView imageView=new ImageView(this);
+		         String s1 = Integer.toString(i)+Integer.toString(j);
+		         int id = Integer.parseInt(s1);
+		         imageView.setId(id);	         
+		         imageView.setLayoutParams(param);
+		         imageView.setBackgroundColor(Color.parseColor("#c26400"));
+		         //imageView.setOnTouchListener(_imageTouch);
+		         imageView.setOnClickListener(_imageClick);
+		         tableRow.addView(imageView);
+              }
+        	_tableLayout.addView(tableRow);
+        }
+        
+    }	
+
+    private class MyImageTouch implements View.OnTouchListener{
+		public boolean onTouch(View v, MotionEvent event) {
+			//v.setBackgroundDrawable(getWallpaper());
+			return true;
+		}
+    }
+
+    private class MyImageClick implements View.OnClickListener{
+    	public void onClick(View v) {
+    		Toast.makeText(getApplicationContext(), 
+					"Fuck off", Toast.LENGTH_SHORT).show();
+			//v.setBackgroundDrawable(getWallpaper());
+			if (_turn) {
+				v.setBackgroundColor(Color.WHITE);
+				_turn = false;
+			}
+			else {
+				v.setBackgroundColor(Color.BLACK);
+				_turn = true;
+			}
+		}
+    }
+    private Bitmap drawCycle(int width, int height){
+		Bitmap bmp = Bitmap.createBitmap(width, height, null);
+		Canvas c = new  Canvas(bmp);
+		c.drawCircle(width, height, width/2, null);
+    	return bmp;
+    }
+	private int getDisplayWidth(){
+		Display display = getWindowManager().getDefaultDisplay();
+	 	return display.getWidth();
+	}
 }
